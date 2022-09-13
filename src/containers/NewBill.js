@@ -25,6 +25,17 @@ export default class NewBill {
     formData.append('file', file)
     formData.append('email', email)
 
+      // const fileTypes = [
+      //   'image/jpeg',
+      //   'image/jpg',
+      //   'image/png'
+      // ]
+      // for(let i = 0; i < fileTypes.length; i++) {
+      //   if(file.type === fileTypes[i]) {
+          
+      //   }
+      // }
+    
     this.store
       .bills()
       .create({
@@ -40,6 +51,7 @@ export default class NewBill {
         this.fileName = fileName
       }).catch(error => console.error(error))
   }
+
   handleSubmit = e => {
     e.preventDefault()
     console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector(`input[data-testid="datepicker"]`).value)
