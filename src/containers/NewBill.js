@@ -24,32 +24,28 @@ export default class NewBill {
     const email = JSON.parse(localStorage.getItem("user")).email
     formData.append('file', file)
     formData.append('email', email)
+    console.log(file.type);
 
-      // const fileTypes = [
-      //   'image/jpeg',
-      //   'image/jpg',
-      //   'image/png'
-      // ]
-      // for(let i = 0; i < fileTypes.length; i++) {
-      //   if(file.type === fileTypes[i]) {
-          
-      //   }
-      // }
-    
-    this.store
-      .bills()
-      .create({
-        data: formData,
-        headers: {
-          noContentType: true
-        }
-      })
-      .then(({fileUrl, key}) => {
-        console.log(fileUrl)
-        this.billId = key
-        this.fileUrl = fileUrl
-        this.fileName = fileName
-      }).catch(error => console.error(error))
+    if (file.type == "image/jpeg" || file.type == "image/png" || file.type == "image/jpg"){
+      this.store
+        .bills()
+        .create({
+          data: formData,
+          headers: {
+            noContentType: true
+          }
+        })
+        .then(({fileUrl, key}) => {
+          console.log(fileUrl)
+          this.billId = key
+          this.fileUrl = fileUrl
+          this.fileName = fileName
+        }).catch(error => console.error(error))
+    }
+    else {
+      alert('Merci de choisir un fichier jpg, png ou jpeg')
+      e.currentTarget.value = ""
+    }
   }
 
   handleSubmit = e => {
