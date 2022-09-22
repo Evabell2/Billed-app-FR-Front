@@ -2,12 +2,14 @@
  * @jest-environment jsdom
  */
 
-import { screen } from "@testing-library/dom"
-import userEvent from "@testing-library/user-event";
 import NewBillUI from "../views/NewBillUI.js"
 import Bills from "../containers/NewBill.js"
+import NewBill from "../containers/NewBill.js"
 import { ROUTES_PATH} from "../constants/routes.js";
+import { ROUTES } from "../constants/routes.js"
 import {localStorageMock} from "../__mocks__/localStorage.js"
+import { fireEvent, screen } from "@testing-library/dom";
+
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page and I choose a file that is not JPG, JPEG or PNG", () => {
@@ -44,51 +46,78 @@ describe("Given I am connected as an employee", () => {
         }
       })
       expect(handleChangeFile).toHaveBeenCalled();
-
       expect(inputFile.files[0].name).toBe("document.pdf");
 
-      // const error = screen.getByTestId("message-error");
+      const message = screen.getByTestId("file-message-error");
+      expect(message).toBeTruthy()
+    })
+  })
+  describe("WHEN I am on NewBill page and I submit a correct form", () => {
+    test("THEN I should be redirected to Bills page", () => {
 
-      // expect(error.textContent).toEqual(
-      //   expect.stringContaining("JPG, JPEG ou PNG uniquement")
-      // );
-      //to-do write assertion
+      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+      window.localStorage.setItem('user', JSON.stringify({
+        type: 'Employee'
+      }))
+      document.body.innerHTML = NewBillUI();
+
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname })
+      }
+      const store = null
+      const containersBills = new NewBill ({
+        document,
+        onNavigate,
+        store,
+        localStorage: window.localStorage,
+      })
+
+      const handleSubmit = jest.fn(containersBills.handleSubmit);
+      containersBills.fileName = "test.png";
+      const formBill = screen.getByTestId("form-new-bill");
+      formBill.addEventListener("submit", handleSubmit);
+      fireEvent.submit(formBill);
+
+      expect(handleSubmit).toHaveBeenCalled();
     })
   })
 })
 
 // test d'intégration POST new bill
-// describe("Given I am connected as an employee", () => {
-//   describe("When I am on NewBill Page", () => {
-//     test("Then I create a new bill", async () => {
-//       document.body.innerHTML = NewBillUI()
 
-//       const onNavigate = (pathname) => {
-//         document.body.innerHTML = ROUTES(pathname)
-//       }
-//       const newBill = new NewBill({
-//         document,
-//         onNavigate,
-//         store: mockStore,
-//         bills: bills,
-//         localStorage: window.localStorage,
-//       })
-//       const btninput = screen.getByLabelText('Envoyer')
-//       const handleSubmit = jest.fn((e) => newBill.handleSubmit(e))
-//       btninput.addEventListener('click', handleSubmit)
+describe("Given I am connected as an employee", () => {
+  describe("When I am on NewBill Page", () => {
+    test("Then I create a new bill", async () => {
 
-//       const create = jest.fn(mockStore.bills().create)
-//       const bill = await create()
-//       expect(create).toHaveBeenCalled()
-
-//       expect(bill.type).toBe("Equipement et matériel")
-//       expect(bill.name).toBe("Ordinateur portable")
-//       expect(bill.date).toBe("2004-04-04")
-//       expect(bill.amount).toBe(348)
-//       expect(bill.vat).toBe("70")
-//       expect(bill.pct).toBe(20)
-//       expect(bill.commentary).toBe("Achat d'un ordinateur portable pour les déplacements")
-//       expect(bill.fileName).toBe("capture.png")
-//     })
-//   })
-// })
+      const billNew = {
+        id: "47qAXb6fIm2zOKkLzMro",
+        vat: "80",
+        fileUrl: "https://test.storage.tld/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=c1640e12-a24b-4b11-ae52-529112e9602a",
+        status: "pending",
+        type: "Hôtel et logement",
+        commentary: "séminaire billed",
+        name: "encore",
+        fileName: "preview-facture-free-201801-pdf-1.jpg",
+        date: "2004-04-04",
+        amount: 400,
+        commentAdmin: "ok",
+        email: "a@a",
+        pct: 20
+      }
+      document.body.innerHTML = NewBillUI();
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES(pathname)
+      }
+      const store = null
+      const containersBills = new NewBill ({
+        document,
+        onNavigate,
+        store,
+        localStorage: window.localStorage,
+      })
+      const create = jest.fn(containersBills.create);
+      const bill = await create(billNew);
+      expect(create).toHaveBeenCalled();
+    })
+  })
+})

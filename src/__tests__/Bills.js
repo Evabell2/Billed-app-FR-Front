@@ -4,12 +4,13 @@
 
 import {screen, waitFor} from "@testing-library/dom"
 import userEvent from "@testing-library/user-event";
-
 import BillsUI from "../views/BillsUI.js"
 import { bills } from "../fixtures/bills.js"
 import Bills from "../containers/Bills.js";
 import { ROUTES_PATH} from "../constants/routes.js";
 import {localStorageMock} from "../__mocks__/localStorage.js"
+
+
 import router from "../app/Router.js";
 
 describe("Given I am connected as an employee", () => {
@@ -39,70 +40,66 @@ describe("Given I am connected as an employee", () => {
     })
   })
   
-  // describe("When I click on the New Bill button", () => {
-  //   test("Then it should display the New Bill Page", async () => {
+  describe("When I click on the New Bill button", () => {
+    test("Then it should display the New Bill Page", async () => {
 
-  //     Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-  //     window.localStorage.setItem('user', JSON.stringify({
-  //       type: 'Employee'
-  //     }))
-  //     const root = document.createElement("div")
-  //     root.setAttribute("id", "root")
-  //     document.body.append(root)
-  //     router()
-  //     window.onNavigate(ROUTES_PATH.Bills)
-  //     await waitFor(() => screen.getByTestId('btn-new-bill'))
+      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+      window.localStorage.setItem('user', JSON.stringify({
+        type: 'Employee'
+      }))
+      document.body.innerHTML = BillsUI({ bills });
+      const root = document.createElement("div")
+      root.setAttribute("id", "root")
+      document.body.append(root)
+      router()
+      window.onNavigate(ROUTES_PATH.Bills)
+      await waitFor(() => screen.getByTestId('btn-new-bill'))
+      const btnNewBill = screen.getByTestId('btn-new-bill')
 
-  //     document.body.innerHTML = BillsUI({ bills })
-  //     const store = null
-  //     const containersBills = new Bills ({
-  //       document,
-  //       onNavigate,
-  //       store,
-  //       localStorage: window.localStorage,
-  //     })
-  //     const handleClickNewBill = jest.fn((e) => containersBills.handleClickNewBill(e))
-      
-  //     const btnNewBill = screen.getByTestId('btn-new-bill')
-  //     btnNewBill.addEventListener('click', handleClickNewBill)
-  //     userEvent.click(btnNewBill);
-  //     expect(handleClickNewBill).toHaveBeenCalled()
-  //   })
-  // })
+      const store = null
+      const containersBills = new Bills ({
+        document,
+        onNavigate,
+        store,
+        localStorage: window.localStorage,
+      })
+      const handleClickNewBill = jest.fn((e) => containersBills.handleClickNewBill(e))
+      btnNewBill.addEventListener('click', handleClickNewBill)
+      userEvent.click(btnNewBill);
+      expect(handleClickNewBill).toHaveBeenCalled()
+      expect(screen.getByText("Envoyer une note de frais")).toBeTruthy();
+    })
+  })
 
-  // describe("When I click on the icon eye", () => {
-  //   test("Then a modal should open"), () => {
-  //     Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-  //     window.localStorage.setItem('user', JSON.stringify({
-  //       type: 'Employee'
-  //     }))
+  describe("When I click on the icon eye", () => {
+    test("Then a modal should open", async () => {
+      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+      window.localStorage.setItem('user', JSON.stringify({
+        type: 'Employee'
+      }))
+      document.body.innerHTML = BillsUI({ data: bills })
+      const root = document.createElement("div")
+      root.setAttribute("id", "root")
+      document.body.append(root)
+      router()
+      window.onNavigate(ROUTES_PATH.Bills)
+      const iconEye = screen.getAllByTestId("icon-eye");
 
-  //     document.body.innerHTML = BillsUI({ bills })
-  //     const store = null
-  //     const containersBills = new Bills ({
-  //       document,
-  //       onNavigate,
-  //       store,
-  //       localStorage: window.localStorage,
-  //     })
-
-  //     const iconEye = screen.getByTestId("icon-eye");
-  //     const handleClickIconEye = jest.fn(containersBills.handleClickIconEye(iconEye));
-  //     iconEye.addEventListener("click", handleClickIconEye);
-  //     userEvent.click(iconEye);
-
-  //     expect(handleClickIconEye).toHaveBeenCalled();
-  //   }
-  // })
-
-  // describe("When it is loading", () => {
-  //   test("Then loading page should be rendered"), () => {
-
-  //     const html = BillsUI({ loading: true });
-  //     document.body.innerHTML = html;
-  //     expect(screen.getAllByText("Loading...")).toBeTruthy();
-  //   }
-  // })
+      const store = null
+      const containersBills = new Bills ({
+        document,
+        onNavigate,
+        store,
+        localStorage: window.localStorage,
+      })
+      $.fn.modal = jest.fn();
+      const handleClickIconEye = jest.fn(containersBills.handleClickIconEye(iconEye[0]))
+      iconEye[0].addEventListener("click", handleClickIconEye)
+      userEvent.click(iconEye[0])
+      expect(handleClickIconEye).toHaveBeenCalled()
+      expect($.fn.modal).toBeTruthy();
+    })
+  })
 })
 
 // test d'intégration GET
