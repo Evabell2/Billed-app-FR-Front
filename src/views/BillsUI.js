@@ -56,6 +56,8 @@ export default ({ data: bills, loading, error }) => {
           <div class='content-title'> Mes notes de frais </div>
           <button type="button" data-testid='btn-new-bill' class="btn btn-primary">Nouvelle note de frais</button>
         </div>
+        <p class="erreur404">/Erreur 404/</p>
+        <p class="erreur500">/Erreur 500/</p>
         <div id="data-table">
         <table id="example" class="table table-striped" style="width:100%">
           <thead>

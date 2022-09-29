@@ -5,10 +5,11 @@
 import NewBillUI from "../views/NewBillUI.js"
 import Bills from "../containers/NewBill.js"
 import NewBill from "../containers/NewBill.js"
-import { ROUTES_PATH} from "../constants/routes.js";
-import { ROUTES } from "../constants/routes.js"
 import {localStorageMock} from "../__mocks__/localStorage.js"
-import { fireEvent, screen } from "@testing-library/dom";
+import { fireEvent, screen, waitFor } from "@testing-library/dom";
+import { ROUTES, ROUTES_PATH } from "../constants/routes"
+import mockStore from "../__mocks__/store"
+import router from "../app/Router.js";
 
 
 describe("Given I am connected as an employee", () => {
@@ -24,7 +25,7 @@ describe("Given I am connected as an employee", () => {
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES_PATH({ pathname });
       };
-      const store = null
+      const store = mockStore
       const containersBills = new Bills ({
         document,
         onNavigate,
@@ -89,6 +90,13 @@ describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
     test("Then I create a new bill", async () => {
 
+      localStorage.setItem("user", JSON.stringify({ type: "Employee", email: "a@a" }));
+      const root = document.createElement("div")
+      root.setAttribute("id", "root")
+      document.body.append(root)
+      router()
+      window.onNavigate(ROUTES_PATH.NewBill)
+
       const billNew = {
         id: "47qAXb6fIm2zOKkLzMro",
         vat: "80",
@@ -104,20 +112,62 @@ describe("Given I am connected as an employee", () => {
         email: "a@a",
         pct: 20
       }
-      document.body.innerHTML = NewBillUI();
-      const onNavigate = (pathname) => {
-        document.body.innerHTML = ROUTES(pathname)
-      }
-      const store = null
+      const store = mockStore
       const containersBills = new NewBill ({
         document,
         onNavigate,
         store,
         localStorage: window.localStorage,
+      })   
+
+      const form = screen.getByTestId('form-new-bill')
+      const handleSubmit = jest.fn((e) => containersBills.handleSubmit(e))
+      form.addEventListener('submit', handleSubmit)
+      fireEvent.submit(form)
+      expect(handleSubmit).toHaveBeenCalled()
+
+      const post = jest.spyOn(containersBills, 'updateBill')
+      const data = await containersBills.updateBill(billNew)
+      // const lengthData = data.length
+
+      expect(post).toHaveBeenCalledTimes(1)
+      // expect(lengthData).toBe(4)
+    })
+    describe("When an error occurs on API", () => {
+      beforeEach(() => {
+        jest.spyOn(mockStore, "bills")
+        Object.defineProperty(window,'localStorage', { value: localStorageMock })
+        window.localStorage.setItem('user', JSON.stringify({
+          type: 'Employee',
+        }))
+        document.body.innerHTML = NewBillUI();
       })
-      const create = jest.fn(containersBills.create);
-      const bill = await create(billNew);
-      expect(create).toHaveBeenCalled();
+      test("Then there is a error 404", async () => {
+  
+        mockStore.bills.mockImplementationOnce(() => {
+          return {
+            list : () =>  {
+              return Promise.reject(new Error("Erreur 404"))
+            }
+          }})
+        const html = NewBillUI({ error: "Erreur 404" });
+        document.body.innerHTML = html;
+        const message = screen.getByText(/Erreur 404/)
+        expect(message).toBeTruthy()
+      })
+      test("Then there is a error 500", async () => {
+  
+        mockStore.bills.mockImplementationOnce(() => {
+          return {
+            list : () =>  {
+              return Promise.reject(new Error("Erreur 500"))
+            }
+          }})
+        const html = NewBillUI({ error: "Erreur 500" });
+        document.body.innerHTML = html;
+        const message = screen.getByText(/Erreur 500/)
+        expect(message).toBeTruthy()
+      })
     })
   })
 })
