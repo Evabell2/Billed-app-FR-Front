@@ -113,3 +113,6 @@ tr td:nth-of-type(5) {
 .bill-proof-container {
   overflow: scroll;
 }
+.erreur404, .erreur500 {
+  display: none;
+}

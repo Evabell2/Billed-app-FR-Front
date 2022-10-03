@@ -9,7 +9,7 @@ export default () => {
         <div class='content-header'>
           <div class='content-title'> Envoyer une note de frais </div>
         </div>
-        <p class="-erreur404-">/Erreur 404/</p>
+        <p class="erreur404">/Erreur 404/</p>
         <p class="erreur500">/Erreur 500/</p>
         <div class="form-newbill-container content-inner">
           <form data-testid="form-new-bill">

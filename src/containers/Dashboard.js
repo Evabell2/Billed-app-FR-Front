@@ -75,6 +75,7 @@ export default class {
     $('#arrow-icon1').click((e) => this.handleShowTickets(e, bills, 1))
     $('#arrow-icon2').click((e) => this.handleShowTickets(e, bills, 2))
     $('#arrow-icon3').click((e) => this.handleShowTickets(e, bills, 3))
+    
     new Logout({ localStorage, onNavigate })
   }
 
@@ -139,20 +140,18 @@ export default class {
       $(`#status-bills-container${this.index}`)
         .html(cards(filteredBills(bills, getStatus(this.index))))
       this.counter ++
-    } else {
+    }
+    else {
       $(`#arrow-icon${this.index}`).css({ transform: 'rotate(90deg)'})
       $(`#status-bills-container${this.index}`)
-        .html("")
+      .html("")
       this.counter ++
     }
-      bills.forEach(bill => {
-        console.log(`#open-bill${bill.id}`);
-        $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills, this.index))
-      })
-
-
+    bills.forEach(bill => {
+      console.log(`#open-bill${bill.id}`);
+      $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills, this.index))
+    })
     return bills
-
   }
 
   getBillsAllUsers = () => {

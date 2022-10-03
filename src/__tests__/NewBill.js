@@ -128,10 +128,7 @@ describe("Given I am connected as an employee", () => {
 
       const post = jest.spyOn(containersBills, 'updateBill')
       const data = await containersBills.updateBill(billNew)
-      // const lengthData = data.length
-
       expect(post).toHaveBeenCalledTimes(1)
-      // expect(lengthData).toBe(4)
     })
     describe("When an error occurs on API", () => {
       beforeEach(() => {
